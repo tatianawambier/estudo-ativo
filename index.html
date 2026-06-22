@@ -200,6 +200,9 @@
   @keyframes spop{0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
   .reportbtn{position:fixed;bottom:14px;right:12px;z-index:55;background:rgba(31,35,71,.85);color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
   .reportbtn:active{transform:scale(.97)}
+  .scorehud #sctime{color:var(--brand2);font-weight:800}
+  .stat.me{background:rgba(124,140,255,.16);border-radius:8px;padding-left:10px;padding-right:10px}
+  .stat.me b{color:var(--brand2)}
 </style>
 </head>
 <body>
@@ -211,7 +214,7 @@
   </div>
 </header>
 <button class="reportbtn" id="reportb">🚩 Relatar problema</button>
-<div class="scorehud" id="scorehud"><span>⭐<b id="scpts">0</b></span><span id="scstreak"></span><button class="mutebtn" id="muteb" title="Som">🔊</button></div>
+<div class="scorehud" id="scorehud"><span>⭐<b id="scpts">0</b></span><span id="scstreak"></span><span id="sctime" style="display:none;margin-left:2px"></span><button class="mutebtn" id="muteb" title="Som">🔊</button></div>
 <div class="app"><div id="stage"></div></div>
 <div class="toast" id="toast"></div>
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
@@ -1263,7 +1266,7 @@ document.addEventListener('click',function(e){
 },true);
 
 function home(){
-  STEPS=[]; chapter=null; setProgress(); showHud(false);
+  STEPS=[]; chapter=null; setProgress(); showHud(false); stopCompTimer(); comp=null;
   stage.innerHTML='';
   const card=document.createElement('div'); card.className='card';
   let h='<div class="tag read">Escolha o que estudar</div><h1>Estudo Ativo</h1>'+
@@ -1296,7 +1299,7 @@ function chooseChapter(subjKey){
   document.getElementById('bk').onclick=home;
   card.querySelectorAll('.home-card').forEach(el=> el.onclick=()=>startChapter(el.dataset.k));
 }
-function startChapter(key){ chapter=CHAPTERS[key]; STEPS=chapter.steps; idx=0; deck.length=0; stats={correct:0,attempts:0,exercises:0,stepsUsed:0,rereads:0}; game={pts:0,streak:0,best:0}; updateScore(); render(); window.scrollTo({top:0}); }
+function startChapter(key){ chapter=CHAPTERS[key]; STEPS=chapter.steps; idx=0; deck.length=0; stats={correct:0,attempts:0,exercises:0,stepsUsed:0,rereads:0}; game={pts:0,streak:0,best:0}; comp=null; stopCompTimer(); updateScore(); render(); window.scrollTo({top:0}); }
 
 /* =====================================================================
    RENDER POR TIPO
@@ -1319,6 +1322,7 @@ function render(){
       '<div class="muted" style="margin-bottom:14px">Baseado no seu material ('+chapter.source+')</div>'+
       linesHTML(chapter.intro)+
       '<div class="row"><button class="btn" id="go">Começar a estudar →</button>'+
+      '<button class="btn alt" id="ccomp">🏁 Competir</button>'+
       '<button class="btn alt" id="vresumo">📄 Ver / imprimir resumo</button></div>'+
       '<div class="kbd">O resumo de 1 página fica disponível a qualquer momento. Ao <b>concluir o capítulo</b>, os flashcards são <b>desbloqueados</b> na tela inicial (📇 Revisar).</div>'+
       (TEST? '<div class="kbd" style="margin-top:10px;border-top:1px dashed var(--line);padding-top:10px">🔧 Atalho de teste — pular para: <select id="jump" class="matchsel" style="max-width:300px;display:inline-block;width:auto">'+jOpts+'</select></div>' : '');
@@ -1326,6 +1330,7 @@ function render(){
     document.getElementById('go').onclick=next;
     document.getElementById('home').onclick=home;
     document.getElementById('vresumo').onclick=showResumo;
+    var _cc=document.getElementById('ccomp'); if(_cc) _cc.onclick=()=>compIntro(chapter.key);
     if(TEST){ const js=document.getElementById('jump'); if(js) js.onchange=function(){ if(this.value!==''){ idx=+this.value; render(); window.scrollTo({top:0,behavior:'smooth'}); } }; }
     updateFcCounter(); return;
   }
@@ -1463,7 +1468,7 @@ function reportProblem(){
   const msg='Estudo Ativo — relato de problema.\n'+ctx+'\nO que aconteceu: ';
   window.open('https://wa.me/5561999661912?text='+encodeURIComponent(msg),'_blank');
 }
-let game={pts:0,streak:0,best:0};
+let game={pts:0,streak:0,best:0}; let comp=null, compTimer=null;
 function isMuted(){ try{return localStorage.getItem('ea_muted')==='1';}catch(e){return false;} }
 function setMuted(m){ try{localStorage.setItem('ea_muted', m?'1':'0');}catch(e){} }
 let _actx=null;
@@ -1488,6 +1493,7 @@ function updateScore(){ const h=document.getElementById('scorehud'); if(!h) retu
   document.getElementById('scpts').textContent=game.pts;
   const st=document.getElementById('scstreak'); st.textContent=game.streak>=2?('🔥'+game.streak):'';
   if(game.streak>=2){ st.classList.remove('streakpop'); void st.offsetWidth; st.classList.add('streakpop'); }
+  const tt=document.getElementById('sctime'); if(tt) tt.style.display=(comp&&comp.active)?'inline':'none';
 }
 const PRAISE=['Boa! 🎉','Mandou bem!','Isso! ✨','Show!','Perfeito!','Arrasou!'];
 const PRAISE_HOT=['Em chamas! 🔥','Combo!','Imparável! 🔥','Sequência!','Tá voando!'];
@@ -1501,6 +1507,48 @@ function reward(){
   const pool=game.streak>=3?PRAISE_HOT:PRAISE; toast(pool[Math.floor(Math.random()*pool.length)]);
 }
 function missStreak(){ game.streak=0; updateScore(); }
+function escapeHtml(x){ return (x||'').replace(/[&<>\"]/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[m];}); }
+function fmtTime(ms){ const s=Math.round(ms/1000); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }
+function getRank(key){ try{ return (JSON.parse(localStorage.getItem('ea_rank')||'{}')[key])||[]; }catch(e){ return []; } }
+function addRank(key, entry){ try{ const all=JSON.parse(localStorage.getItem('ea_rank')||'{}'); const arr=(all[key]||[]); arr.push(entry); arr.sort(function(a,b){return a.t-b.t;}); all[key]=arr.slice(0,10); localStorage.setItem('ea_rank', JSON.stringify(all)); return all[key]; }catch(e){ return [entry]; } }
+function stopCompTimer(){ if(compTimer){ clearInterval(compTimer); compTimer=null; } }
+function startCompTimer(){ stopCompTimer(); const tt=document.getElementById('sctime'); if(tt) tt.style.display='inline'; compTimer=setInterval(function(){ const e=document.getElementById('sctime'); if(e&&comp) e.textContent='\u23f1 '+fmtTime(Date.now()-comp.start); }, 250); }
+function rankTableHTML(key){ const r=getRank(key); if(!r.length) return '<div class=\"kbd\">Ainda não há tempos registrados aqui. Seja o primeiro! 🏁</div>'; return '<div class=\"feedback\" style=\"margin-top:16px\"><h4 style=\"color:var(--brand2)\">🏆 Ranking</h4>'+r.map(function(e,i){return '<div class=\"stat\"><span class=\"muted\">'+(i+1)+'º '+escapeHtml(e.name)+'</span><b>'+fmtTime(e.t)+'</b></div>';}).join('')+'</div>'; }
+function compIntro(key){ chapter=CHAPTERS[key]; STEPS=[]; idx=0; comp=null; stopCompTimer(); showHud(false); setProgress(); stage.innerHTML='';
+  const card=document.createElement('div'); card.className='card';
+  card.innerHTML='<button class=\"backbar\" id=\"home\">← Matérias</button>'+
+    '<div class=\"tag final\">🏁 Modo competição</div>'+
+    '<h1>Corrida: '+chapter.title+'</h1>'+
+    '<p class=\"line\">Faça a trilha o mais rápido que conseguir. Errar te manda reler — então quem estudou melhor termina antes. Ganha o <b>menor tempo</b>! ⏱️</p>'+
+    '<p class=\"line\" style=\"margin-bottom:6px\">Seu nome ou apelido:</p>'+
+    '<input id=\"cname\" type=\"text\" placeholder=\"Ex.: Gustavo\" maxlength=\"18\">'+
+    '<div class=\"row\"><button class=\"btn\" id=\"cgo\">🏁 Começar corrida</button></div>'+
+    rankTableHTML(key);
+  stage.appendChild(card);
+  document.getElementById('home').onclick=home;
+  document.getElementById('cgo').onclick=function(){ const nm=(document.getElementById('cname').value||'').trim()||'Anônimo'; startCompetition(key, nm); };
+}
+function startCompetition(key, name){ chapter=CHAPTERS[key]; STEPS=chapter.steps; idx=0; deck.length=0;
+  stats={correct:0,attempts:0,exercises:0,stepsUsed:0,rereads:0}; game={pts:0,streak:0,best:0};
+  comp={active:true, name:name, start:Date.now(), key:key};
+  while(idx<STEPS.length-1 && STEPS[idx].type==='intro') idx++;
+  updateScore(); render(); startCompTimer(); window.scrollTo({top:0}); }
+function renderCompResult(card){ stopCompTimer(); const t=Date.now()-comp.start; const key=comp.key, nm=comp.name;
+  const entry={name:nm, t:t, pts:game.pts, date:Date.now()}; const board=addRank(key, entry);
+  const myPos=board.findIndex(function(e){return e.date===entry.date;})+1; unlockFc(key);
+  card.className='card summary';
+  card.innerHTML='<button class=\"backbar\" id=\"home\">← Matérias</button>'+
+    '<div class=\"tag final\">🏁 Corrida concluída</div>'+
+    '<div class=\"center\"><div class=\"big\">'+(myPos===1?'🥇':'⏱️')+'</div><p class=\"lead\">'+escapeHtml(nm)+', você terminou em <b>'+fmtTime(t)+'</b>'+(myPos===1?' — 1º lugar! 🎉':'')+'</p></div>'+
+    '<div style=\"margin-top:8px\">'+stat('Seu tempo','⏱ '+fmtTime(t))+stat('Pontos','⭐ '+game.pts)+stat('Posição', (myPos>0?myPos+'º':'—'))+'</div>'+
+    '<div class=\"feedback\" style=\"margin-top:16px\"><h4 style=\"color:var(--brand2)\">🏆 Ranking — '+chapter.title+'</h4>'+
+      board.map(function(e,i){return '<div class=\"stat'+(e.date===entry.date?' me':'')+'\"><span class=\"muted\">'+(i+1)+'º '+escapeHtml(e.name)+'</span><b>'+fmtTime(e.t)+'</b></div>';}).join('')+'</div>'+
+    '<div class=\"row\"><button class=\"btn\" id=\"again\">🏁 Correr de novo</button><button class=\"btn alt\" id=\"home2\">Sair</button></div>';
+  confetti(myPos===1?52:30); beep(true); comp=null;
+  document.getElementById('home').onclick=home;
+  document.getElementById('home2').onclick=home;
+  document.getElementById('again').onclick=function(){ compIntro(key); };
+}
 function renderDeck(card, standalone){
   let pos=0;
   const cards=allCards();  // sempre o capítulo inteiro
@@ -1554,6 +1602,7 @@ function showResumo(){
 
 /* ---- resumo final ---- */
 function renderSummary(card){
+  if(comp&&comp.active){ renderCompResult(card); return; }
   const pct=stats.attempts?Math.round(stats.correct/stats.attempts*100):0;
   unlockFc(chapter.key);
   card.className='card summary';
