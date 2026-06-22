@@ -1444,16 +1444,21 @@ const STEPS_PC = [
 
 { type:'read', tag:'SD 10 · 8', title:'Adjetivas: função do pronome relativo', src:'Nota de aula',
   lines:[
-    'O pronome relativo retoma o <b>antecedente</b>. Para achar sua função, <b>substitua</b> o relativo pelo antecedente e reorganize a oração.',
-    '"Conheci o atleta <i>que</i> venceu a prova" → "o atleta venceu a prova": "que" = <b>sujeito</b>.',
-    '"O livro <i>que</i> li é excelente" → "li o livro": "que" = <b>objeto direto</b>.',
-    '"Esta é a prova <i>de que</i> precisamos" → "precisamos da prova": "de que" = <b>objeto indireto</b> (o verbo exige preposição).'
+    '<b>Atenção: são duas perguntas diferentes!</b> (1) Que <b>tipo</b> é a oração? (2) Que <b>função</b> o pronome "que" exerce <i>dentro</i> dela?',
+    'Ex.: a oração "que li" é uma <b>adjetiva restritiva</b> (tipo). Mas o <b>pronome "que"</b>, dentro dela, tem uma função sintática própria.',
+    'Para achar a função do pronome: <b>troque o "que" pelo antecedente</b> e reorganize a oração.',
+    '"Conheci o atleta <i>que</i> venceu a prova" → "que" = "o atleta" → "<b>o atleta</b> venceu a prova". Como "o atleta" é <b>sujeito</b>, o "que" funciona como <b>sujeito</b>.',
+    '"O livro <i>que</i> li é excelente" → "que" = "o livro" → "li <b>o livro</b>". Como "o livro" é <b>objeto direto</b> de "li", o "que" funciona como <b>objeto direto</b> — e a oração "que li" continua sendo <b>adjetiva restritiva</b>.',
+    '"Esta é a prova <i>de que</i> precisamos" → "de que" = "da prova" → "precisamos <b>da prova</b>". Logo "de que" é <b>objeto indireto</b> (o verbo "precisar" pede preposição).'
   ],
   cards:[
-    {cat:'Relativo',q:'Como descobrir a função do pronome relativo?',a:'Substituir o relativo pelo antecedente e reorganizar a oração; ver a função do antecedente.'},
-    {cat:'Relativo',q:'Em "o livro que li", qual a função do "que"?',a:'Objeto direto ("li o livro").'}
+    {cat:'Relativo',q:'A classificação da ORAÇÃO e a função do PRONOME relativo são a mesma coisa?',a:'Não! A oração pode ser adjetiva restritiva (tipo), enquanto o pronome "que" dentro dela é sujeito, objeto direto etc. (função).'},
+    {cat:'Relativo',q:'Como descobrir a função do pronome relativo?',a:'Trocar o "que" pelo antecedente e reorganizar a oração; a função que o antecedente assume é a do "que".'},
+    {cat:'Relativo',q:'Em "O livro que li é excelente", qual a função do pronome "que"?',a:'Objeto direto: "que" = "o livro", e "li o livro" (a oração é adjetiva restritiva).'}
   ],
   questions:[
+    { type:'mc', q:'Em "O livro que li é excelente": a oração "que li" é adjetiva restritiva. E o pronome "que", dentro dela, funciona como:',
+      options:['Objeto direto (de "li")','Sujeito','Uma conjunção','Outra oração'], correct:0, explain:'Tipo da oração = adjetiva restritiva; função do pronome "que" = objeto direto ("li o livro").' },
     { type:'mc', q:'Em "Conheci o atleta que venceu a prova", o "que" exerce função de:',
       options:['Sujeito','Objeto direto','Objeto indireto','Adjunto'], correct:0, explain:'"o atleta venceu" → sujeito.' },
     { type:'mc', q:'Em "Esta é a prova de que precisamos", "de que" é:',
