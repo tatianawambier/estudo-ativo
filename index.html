@@ -124,7 +124,9 @@
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
   .flash{perspective:1200px}
-  .flash-inner{position:relative;min-height:200px;border-radius:16px;cursor:pointer;transition:transform .5s;transform-style:preserve-3d}
+  .flash-inner{position:relative;min-height:280px;border-radius:16px;cursor:pointer;transition:transform .5s;transform-style:preserve-3d}
+  .fc-col{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;width:100%}
+  .fc-img{max-width:100%;max-height:175px;border-radius:8px}
   .flash-inner.flip{transform:rotateY(180deg)}
   .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:16px;
     display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;border:1px solid var(--line);font-size:19px;line-height:1.5}
@@ -1888,7 +1890,7 @@ function renderCompResult(card){ stopCompTimer(); const t=Date.now()-comp.start;
 }
 function renderDeck(card, standalone){
   let pos=0;
-  const cards=allCards();  // sempre o capítulo inteiro
+  const cards=allDeckCards();  // conceito + identificação na figura
   function draw(){
     card.className='card';
     if(!cards.length){ card.innerHTML='<p>Nenhum flashcard.</p>'; return; }
@@ -1896,7 +1898,7 @@ function renderDeck(card, standalone){
     card.innerHTML=(standalone?'<button class="backbar" id="fhome">← Início</button>':'')+
       '<div class="tag rev">📇 '+(standalone?('Flashcards — '+chapter.title):'Revisão de flashcards')+'</div>'+
       '<p class="hint">Cobrem todo o capítulo. Cartão <b>'+(pos+1)+'</b> de <b>'+cards.length+'</b>. Toque para virar.</p>'+
-      '<div class="flash"><div class="flash-inner" id="fi"><div class="face front"><div class="fc-cat">'+c.cat+'</div>'+c.q+'</div>'+
+      '<div class="flash"><div class="flash-inner" id="fi"><div class="face front"><div class="fc-cat">'+c.cat+'</div><div class="fc-col">'+(c.img?'<img class="fc-img" src="'+IMG[c.img]+'" alt="figura">':'')+'<div>'+c.q+'</div></div></div>'+
       '<div class="face back"><div class="fc-cat">resposta</div>'+c.a+'</div></div></div>'+
       '<div class="row"><button class="btn alt" id="flip">Virar</button>'+
       (pos>0?'<button class="btn alt" id="prev">← Anterior</button>':'')+
@@ -1916,6 +1918,7 @@ function openFlashcards(key){ chapter=CHAPTERS[key]; STEPS=chapter.steps; idx=0;
 
 /* ---- resumo (todos os itens, independe de progresso) ---- */
 function allCards(){ const out=[]; STEPS.forEach(s=>{ (s.cards||[]).forEach(c=>{ if(!out.some(d=>d.q===c.q)) out.push({cat:c.cat||'Conceito',q:c.q,a:c.a}); }); }); return out; }
+function allDeckCards(){ const out=allCards().slice(); STEPS.forEach(s=>{ (s.questions||[]).forEach(q=>{ if(q.type==='typed' && q.img){ const a=(q.explain||((q.accept||[])[0])||'').toString(); out.push({cat:'Identifique na figura',q:q.q,a:a,img:q.img}); } }); }); return out; }
 function showResumo(){
   stage.innerHTML='';
   const cards=allCards(); const groups={}, order=[];
@@ -1952,10 +1955,10 @@ function renderSummary(card){
       stat('Pontos neste capítulo', '⭐ '+game.pts)+
       stat('Maior sequência', '🔥 '+game.best)+
       stat('Vezes que voltou ao texto', stats.rereads)+
-      stat('Flashcards do capítulo', allCards().length)+
+      stat('Flashcards do capítulo', allDeckCards().length)+
     '</div>'+
     '<div class="feedback" style="margin-top:18px"><h4 style="color:var(--brand2)">🔓 Flashcards desbloqueados!</h4>'+
-    '<p>Os '+allCards().length+' cartões deste capítulo agora ficam na <b>tela inicial</b>, em "📇 Revisar", para praticar quando quiser. A revisão rende mais quando é espaçada no tempo.</p></div>'+
+    '<p>Os '+allDeckCards().length+' cartões deste capítulo agora ficam na <b>tela inicial</b>, em "📇 Revisar", para praticar quando quiser. A revisão rende mais quando é espaçada no tempo.</p></div>'+
     '<div class="row"><button class="btn ok" id="fcgo">📇 Fazer flashcards agora</button><button class="btn" id="resumo">📄 Resumo de 1 página</button></div>'+
     '<div class="row"><button class="btn alt" id="again">Refazer capítulo</button><button class="btn alt" id="home2">Outra matéria</button></div>';
   document.getElementById('again').onclick=()=>startChapter(chapter.key);
