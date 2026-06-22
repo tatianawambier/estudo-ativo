@@ -186,6 +186,18 @@
     .card{box-shadow:none;border:none;background:transparent;padding:0}
     .sheet{padding:0}
   }
+
+  /* --- gamificação --- */
+  .scorehud{position:fixed;top:64px;right:12px;z-index:60;display:none;align-items:center;gap:8px;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:6px 11px;font-weight:800;font-size:14px;box-shadow:var(--shadow)}
+  .scorehud #scstreak{color:#ffcf6b;display:inline-block}
+  .scorehud .mutebtn{background:none;border:none;font-size:16px;cursor:pointer;padding:0 2px;line-height:1;color:var(--ink)}
+  .floatpts{position:fixed;left:50%;top:96px;transform:translateX(-50%);z-index:10000;font-weight:900;color:#37d399;font-size:26px;pointer-events:none;animation:floatup 950ms ease-out forwards;text-shadow:0 2px 10px rgba(0,0,0,.45)}
+  @keyframes floatup{0%{opacity:0;transform:translate(-50%,10px) scale(.7)}20%{opacity:1}100%{opacity:0;transform:translate(-50%,-44px) scale(1.15)}}
+  .confw{position:fixed;inset:0;pointer-events:none;z-index:9998;overflow:hidden}
+  .conf{position:absolute;top:-6vh;width:10px;height:14px;border-radius:2px;animation:conffall var(--d) ease-in forwards}
+  @keyframes conffall{0%{opacity:1;transform:translateY(-10vh) rotate(0)}100%{opacity:.85;transform:translateY(112vh) rotate(700deg)}}
+  .streakpop{animation:spop .4s ease}
+  @keyframes spop{0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
 </style>
 </head>
 <body>
@@ -196,6 +208,7 @@
     <div class="pill" id="pill">—</div>
   </div>
 </header>
+<div class="scorehud" id="scorehud"><span>⭐<b id="scpts">0</b></span><span id="scstreak"></span><button class="mutebtn" id="muteb" title="Som">🔊</button></div>
 <div class="app"><div id="stage"></div></div>
 <div class="toast" id="toast"></div>
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
@@ -1015,11 +1028,11 @@ function mcChoices(wrap, options, correctIndex, explain, cb, doShuffle){
       if(correct){ stats.correct++; box.children[correctIdx].classList.add('correct');
         fb.className='feedback good'; fb.innerHTML='<h4>✅ Correto!</h4><p>'+(explain||'')+'</p>'; wrap.appendChild(fb);
         const r=document.createElement('div'); r.className='row'; r.innerHTML='<button class="btn ok" id="c">Continuar →</button>'; wrap.appendChild(r);
-        document.getElementById('c').onclick=cb.ok; toast('Boa! 🎉');
+        document.getElementById('c').onclick=cb.ok; reward();
       }else{
         fb.className='feedback bad'; fb.innerHTML='<h4>❌ Ainda não</h4><p>A resposta não fica aqui. Volte ao texto, releia e tente de novo.</p>'; wrap.appendChild(fb);
         const r=document.createElement('div'); r.className='row'; r.innerHTML='<button class="btn" id="b">Reler o trecho →</button>'; wrap.appendChild(r);
-        document.getElementById('b').onclick=cb.back; toast('Vamos reler 🔁');
+        document.getElementById('b').onclick=cb.back; missStreak(); toast('Vamos reler 🔁');
       }
     };
     box.appendChild(o);
@@ -1078,12 +1091,12 @@ function renderMatch(item, host, cb){
       sels.forEach(s=>{s.sel.classList.add('ok');s.sel.disabled=true;});
       const fb=document.createElement('div'); fb.className='feedback good'; fb.innerHTML='<h4>✅ Correto!</h4><p>'+(item.explain||'')+'</p>'; wrap.appendChild(fb);
       const r=document.createElement('div'); r.className='row'; r.innerHTML='<button class="btn ok" id="c">Continuar →</button>'; wrap.appendChild(r);
-      document.getElementById('c').onclick=cb.ok; toast('Boa! 🎉');
+      document.getElementById('c').onclick=cb.ok; reward();
     }else{
       sels.forEach(s=>{ s.sel.classList.remove('ok'); s.sel.classList.toggle('bad', s.sel.value!==s.correct); });
       const fb=document.createElement('div'); fb.className='feedback bad'; fb.innerHTML='<h4>❌ Alguns pares estão errados</h4><p>Os marcados em vermelho não estão certos. Volte ao texto, releia e tente de novo.</p>'; wrap.appendChild(fb);
       const r=document.createElement('div'); r.className='row'; r.innerHTML='<button class="btn" id="b">Reler o trecho →</button>'; wrap.appendChild(r);
-      document.getElementById('b').onclick=cb.back; toast('Vamos reler 🔁');
+      document.getElementById('b').onclick=cb.back; missStreak(); toast('Vamos reler 🔁');
     }
   };
   document.getElementById('dk').onclick=()=>{ if(!done) cb.back(); };
@@ -1117,8 +1130,8 @@ function renderNum(item, host, cb){
       done=true; stats.correct++; stats.exercises++; inp.disabled=true;
       const fb=document.createElement('div'); fb.className='feedback good'; fb.innerHTML='<h4>✅ Isso!</h4><p>Resposta: <b>'+item.answer+' '+(item.unit||'')+'</b></p>'; wrap.appendChild(fb);
       const r=document.createElement('div'); r.className='row'; r.innerHTML='<button class="btn ok" id="c">Continuar →</button>'; wrap.appendChild(r);
-      document.getElementById('c').onclick=cb.ok; toast('Boa! 🎉');
-    }else{ toast('Ainda não — veja o próximo passo ou reveja a fórmula.'); revealStep(); }
+      document.getElementById('c').onclick=cb.ok; reward();
+    }else{ missStreak(); toast('Ainda não — veja o próximo passo ou reveja a fórmula.'); revealStep(); }
   };
   const hb=document.getElementById('hint'); if(hb) hb.onclick=revealStep;
   document.getElementById('back').onclick=cb.back;
@@ -1146,11 +1159,11 @@ function renderTyped(item, host, cb){
     if(ok){ done=true; stats.correct++; inp.disabled=true;
       const fb=document.createElement('div'); fb.className='feedback good'; fb.innerHTML='<h4>✅ Isso!</h4><p>'+(item.explain||'')+'</p>'; wrap.appendChild(fb);
       const r=document.createElement('div'); r.className='row'; r.innerHTML='<button class="btn ok" id="c">Continuar →</button>'; wrap.appendChild(r);
-      document.getElementById('c').onclick=cb.ok; toast('Boa! 🎉');
+      document.getElementById('c').onclick=cb.ok; reward();
     }else{
       const fb=document.createElement('div'); fb.className='feedback bad'; fb.innerHTML='<h4>❌ Ainda não</h4><p>A resposta não fica aqui. Volte ao texto, releia e tente escrever de novo.</p>'; wrap.appendChild(fb);
       const r=document.createElement('div'); r.className='row'; r.innerHTML='<button class="btn" id="b">Reler o trecho →</button>'; wrap.appendChild(r);
-      document.getElementById('b').onclick=cb.back; toast('Vamos reler 🔁');
+      document.getElementById('b').onclick=cb.back; missStreak(); toast('Vamos reler 🔁');
     }
   }
   document.getElementById('vf').onclick=check;
@@ -1247,7 +1260,7 @@ document.addEventListener('click',function(e){
 },true);
 
 function home(){
-  STEPS=[]; chapter=null; setProgress();
+  STEPS=[]; chapter=null; setProgress(); showHud(false);
   stage.innerHTML='';
   const card=document.createElement('div'); card.className='card';
   let h='<div class="tag read">Escolha o que estudar</div><h1>Estudo Ativo</h1>'+
@@ -1262,7 +1275,7 @@ function home(){
     unlocked.forEach(k=>{ const c=CHAPTERS[k]; h+='<div class="home-card rev-card" data-fc="'+k+'"><div class="home-emoji">📇</div><div><h3>'+c.title+'</h3><p>'+c.subject+' • flashcards</p></div></div>'; });
     h+='</div>';
   }
-  h+='<div class="kbd">Protótipo. Cada capítulo foi construído a partir do material real enviado.</div>';
+  h+='<div class="kbd">⭐ XP total: '+getXP()+' • Protótipo. Cada capítulo foi construído a partir do material real enviado.</div>';
   card.innerHTML=h; stage.appendChild(card);
   card.querySelectorAll('.home-card[data-s]').forEach(el=> el.onclick=()=>{ const s=SUBJECTS.find(x=>x.key===el.dataset.s); if(s.chapters.length===1) startChapter(s.chapters[0]); else chooseChapter(s.key); });
   card.querySelectorAll('[data-fc]').forEach(el=> el.onclick=()=>openFlashcards(el.dataset.fc));
@@ -1280,7 +1293,7 @@ function chooseChapter(subjKey){
   document.getElementById('bk').onclick=home;
   card.querySelectorAll('.home-card').forEach(el=> el.onclick=()=>startChapter(el.dataset.k));
 }
-function startChapter(key){ chapter=CHAPTERS[key]; STEPS=chapter.steps; idx=0; deck.length=0; stats={correct:0,attempts:0,exercises:0,stepsUsed:0,rereads:0}; render(); window.scrollTo({top:0}); }
+function startChapter(key){ chapter=CHAPTERS[key]; STEPS=chapter.steps; idx=0; deck.length=0; stats={correct:0,attempts:0,exercises:0,stepsUsed:0,rereads:0}; game={pts:0,streak:0,best:0}; updateScore(); render(); window.scrollTo({top:0}); }
 
 /* =====================================================================
    RENDER POR TIPO
@@ -1440,6 +1453,44 @@ function octopusSVG(hl){
 function labtxt(x,y,t){ return '<text x="'+x+'" y="'+y+'" fill="#cdd4ff" font-size="12" text-anchor="middle">'+t+'</text>'; }
 
 /* ---- baralho ---- */
+let game={pts:0,streak:0,best:0};
+function isMuted(){ try{return localStorage.getItem('ea_muted')==='1';}catch(e){return false;} }
+function setMuted(m){ try{localStorage.setItem('ea_muted', m?'1':'0');}catch(e){} }
+let _actx=null;
+function beep(success){
+  if(isMuted()) return;
+  try{ _actx=_actx||new (window.AudioContext||window.webkitAudioContext)(); const ctx=_actx, now=ctx.currentTime;
+    (success?[660,880]:[300]).forEach((f,k)=>{ const o=ctx.createOscillator(),g=ctx.createGain(); o.type='triangle'; o.frequency.value=f;
+      g.gain.setValueAtTime(0.0001,now+k*0.09); g.gain.exponentialRampToValueAtTime(0.18,now+k*0.09+0.02); g.gain.exponentialRampToValueAtTime(0.0001,now+k*0.09+0.2);
+      o.connect(g); g.connect(ctx.destination); o.start(now+k*0.09); o.stop(now+k*0.09+0.22); }); }catch(e){}
+}
+function confetti(n){ n=n||16; const w=document.createElement('div'); w.className='confw';
+  const cols=['#7c8cff','#56e0c4','#37d399','#ffcf6b','#ff7a90','#c0397e'];
+  for(let i=0;i<n;i++){ const p=document.createElement('div'); p.className='conf'; p.style.left=(8+Math.random()*84)+'vw';
+    p.style.background=cols[i%cols.length]; p.style.setProperty('--d',(0.8+Math.random()*0.7)+'s'); p.style.animationDelay=(Math.random()*0.18)+'s'; w.appendChild(p); }
+  document.body.appendChild(w); setTimeout(()=>w.remove(),1800);
+}
+function floatPts(txt){ const el=document.createElement('div'); el.className='floatpts'; el.textContent=txt; document.body.appendChild(el); setTimeout(()=>el.remove(),980); }
+function getXP(){ try{ return +localStorage.getItem('ea_xp')||0; }catch(e){ return 0; } }
+function addXP(n){ try{ const x=getXP()+n; localStorage.setItem('ea_xp',x);}catch(e){} }
+function showHud(on){ const h=document.getElementById('scorehud'); if(h) h.style.display=on?'flex':'none'; }
+function updateScore(){ const h=document.getElementById('scorehud'); if(!h) return; h.style.display='flex';
+  document.getElementById('scpts').textContent=game.pts;
+  const st=document.getElementById('scstreak'); st.textContent=game.streak>=2?('🔥'+game.streak):'';
+  if(game.streak>=2){ st.classList.remove('streakpop'); void st.offsetWidth; st.classList.add('streakpop'); }
+}
+const PRAISE=['Boa! 🎉','Mandou bem!','Isso! ✨','Show!','Perfeito!','Arrasou!'];
+const PRAISE_HOT=['Em chamas! 🔥','Combo!','Imparável! 🔥','Sequência!','Tá voando!'];
+function reward(){
+  game.streak++; if(game.streak>game.best) game.best=game.streak;
+  const gain=10 + Math.min(Math.max(game.streak-1,0),5)*5;
+  game.pts+=gain; addXP(gain);
+  confetti(game.streak>=3?26:16); beep(true);
+  floatPts('+'+gain+(game.streak>=2?'  🔥'+game.streak:''));
+  updateScore();
+  const pool=game.streak>=3?PRAISE_HOT:PRAISE; toast(pool[Math.floor(Math.random()*pool.length)]);
+}
+function missStreak(){ game.streak=0; updateScore(); }
 function renderDeck(card, standalone){
   let pos=0;
   const cards=allCards();  // sempre o capítulo inteiro
@@ -1466,7 +1517,7 @@ function renderDeck(card, standalone){
 }
 function fcUnlocked(){ try{ return JSON.parse(localStorage.getItem('ea_fc_unlocked')||'[]'); }catch(e){ return []; } }
 function unlockFc(key){ try{ const u=fcUnlocked(); if(!u.includes(key)){ u.push(key); localStorage.setItem('ea_fc_unlocked', JSON.stringify(u)); } }catch(e){} }
-function openFlashcards(key){ chapter=CHAPTERS[key]; STEPS=chapter.steps; idx=0; setProgress(); stage.innerHTML=''; const card=document.createElement('div'); stage.appendChild(card); renderDeck(card,true); window.scrollTo({top:0}); }
+function openFlashcards(key){ chapter=CHAPTERS[key]; STEPS=chapter.steps; idx=0; setProgress(); showHud(false); stage.innerHTML=''; const card=document.createElement('div'); stage.appendChild(card); renderDeck(card,true); window.scrollTo({top:0}); }
 
 /* ---- resumo (todos os itens, independe de progresso) ---- */
 function allCards(){ const out=[]; STEPS.forEach(s=>{ (s.cards||[]).forEach(c=>{ if(!out.some(d=>d.q===c.q)) out.push({cat:c.cat||'Conceito',q:c.q,a:c.a}); }); }); return out; }
@@ -1502,6 +1553,8 @@ function renderSummary(card){
     '<div style="margin-top:18px">'+
       stat('Respostas corrigidas pelo app', stats.attempts)+
       stat('Acertos', stats.correct+' ('+pct+'%)')+
+      stat('Pontos neste capítulo', '⭐ '+game.pts)+
+      stat('Maior sequência', '🔥 '+game.best)+
       stat('Vezes que voltou ao texto', stats.rereads)+
       stat('Flashcards do capítulo', allCards().length)+
     '</div>'+
@@ -1514,6 +1567,7 @@ function renderSummary(card){
   document.getElementById('home2').onclick=home;
   document.getElementById('resumo').onclick=showResumo;
   var _f=document.getElementById('fcgo'); if(_f) _f.onclick=()=>openFlashcards(chapter.key);
+  showHud(false); confetti(44); beep(true);
 }
 function stat(l,v){ return '<div class="stat"><span class="muted">'+l+'</span><b>'+v+'</b></div>'; }
 
@@ -1524,6 +1578,7 @@ function stat(l,v){ return '<div class="stat"><span class="muted">'+l+'</span><b
     if(n>=3){ n=0; TEST=true; if(STEPS.length && STEPS[idx] && STEPS[idx].type==='intro') render(); toast('🔧 Modo de teste ligado'); } });
 })();
 home();
+(function(){ const mb=document.getElementById('muteb'); if(mb){ mb.textContent=isMuted()?'🔇':'🔊'; mb.onclick=function(e){ e.stopPropagation(); setMuted(!isMuted()); mb.textContent=isMuted()?'🔇':'🔊'; if(!isMuted()) beep(true); }; } })();
 </script>
 </body>
 </html>
