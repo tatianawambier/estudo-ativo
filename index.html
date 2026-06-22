@@ -360,7 +360,6 @@ const STEPS_FISICA = [
     { prompt:'P.78 (b) — Com v_m = 17,5 m/s durante 5 s, qual a distância percorrida?', answer:87.5, unit:'m', tol:0.1, steps:['Δs = v_m · Δt = 17,5 · 5.','Δs = 87,5 m.'] },
     { prompt:'P.81 — Parte do repouso e, com α = 5 m/s², atinge 20 m/s. Qual a distância Δs?', answer:40, unit:'m', tol:0.1, steps:['20² = 0 + 2·5·Δs → 400 = 10·Δs.','Δs = 40 m.'] }
   ] },
-{ type:'deck' },
 { type:'summary' }
 ];
 
@@ -705,7 +704,6 @@ const STEPS_BIO = [
     { type:'cloze', q:'O caramujo-gigante-africano é uma espécie ___.', options:['invasora','nativa','marinha protegida','extinta'], correct:0, explain:'É invasora.' }
   ] },
 
-{ type:'deck' },
 { type:'summary' }
 ];
 
@@ -899,17 +897,18 @@ const STEPS_PORIFEROS = [
     'Algumas são <b>dioicas</b> (sexos separados), mas a maioria é <b>hermafrodita (monoica)</b>.',
     'Nas monoicas, os gametas saem em <b>épocas diferentes</b>, evitando autofecundação — a fecundação é <b>cruzada</b>.',
     'A <b>escolha do sexo</b> pode depender do <b>ambiente</b>.',
-    'Esponjas de <b>água doce</b> formam a <b>gêmula</b>: uma estrutura de <b>resistência</b>.',
-    'No desenvolvimento surgem as larvas <b>anfiblástula</b> e <b>parenquímula</b>.',
-    'A sequência é: <b>zigoto → mórula → blástula → gástrula</b>.'
+    'A <b>gemulação</b> forma a <b>gêmula</b>: uma estrutura de <b>resistência</b>, comum em esponjas de <b>água doce</b>.',
+    'Na reprodução sexuada a fecundação é <b>interna</b> e surgem as larvas <b>anfiblástula</b> e <b>parenquímula</b>.',
+    'O desenvolvimento vai do <b>zigoto</b> à <b>blástula</b> e <b>para por aí</b>: forma a larva, <b>sem chegar à gástrula</b>.',
+    'Como <b>não gastrulam</b>, não formam folhetos embrionários — por isso são <b>ablásticos</b>.'
   ],
   cards:[
-    {cat:'Reprodução',q:'Quais as duas formas de reprodução assexuada nas esponjas?',a:'Fragmentação (graças à regeneração) e brotamento.'},
+    {cat:'Reprodução',q:'Quais as três formas de reprodução assexuada nas esponjas?',a:'Brotamento, fragmentação (regeneração) e gemulação (formação da gêmula).'},
     {cat:'Reprodução',q:'A maioria das esponjas é dioica ou hermafrodita?',a:'Hermafrodita (monoica) — a minoria é dioica.'},
     {cat:'Reprodução',q:'Por que a fecundação costuma ser cruzada nas esponjas monoicas?',a:'Porque os gametas masculino e feminino saem em épocas diferentes, evitando autofecundação.'},
     {cat:'Reprodução',q:'O que é a gêmula e onde é comum?',a:'Uma estrutura de resistência, comum em esponjas de água doce.'},
     {cat:'Reprodução',q:'Quais as duas larvas das esponjas?',a:'Anfiblástula e parenquímula.'},
-    {cat:'Reprodução',q:'Qual a sequência do desenvolvimento embrionário?',a:'Zigoto → mórula → blástula → gástrula.'}
+    {cat:'Reprodução',q:'Até onde vai o desenvolvimento dos poríferos?',a:'Zigoto → mórula → blástula → larva; NÃO chega à gástrula (por isso são ablásticos).'}
   ],
   questions:[
     { type:'mc', q:'A reprodução por fragmentação é possível graças ao(à):',
@@ -921,8 +920,10 @@ const STEPS_PORIFEROS = [
       options:['cruzada','dupla','interna apenas','impossível'], correct:0, explain:'Fecundação cruzada, evitando autofecundação.' },
     { type:'mc', q:'A gêmula, estrutura de resistência, é típica de esponjas de:',
       options:['água doce','água salgada profunda','ambientes secos','regiões polares'], correct:0, explain:'Gêmula: resistência, comum em água doce.' },
-    { type:'cloze', q:'Complete: o desenvolvimento é zigoto → mórula → blástula → ___.',
-      options:['gástrula','larva','ovo','gêmula'], correct:0, explain:'...→ gástrula.' }
+    { type:'cloze', q:'Complete: nos poríferos o desenvolvimento para na blástula, que origina a ___ (não há gástrula).',
+      options:['larva','gástrula','medusa','gêmula'], correct:0, explain:'A blástula vira larva (anfiblástula/parenquímula); não chega à gástrula → ablásticos.' },
+    { type:'mc', q:'Por que os poríferos são ablásticos?',
+      options:['Não completam a gastrulação, então não formam folhetos embrionários','Porque têm muitos folhetos embrionários','Porque vivem em água doce','Porque têm sistema nervoso'], correct:0, explain:'Sem gastrulação não há folhetos embrionários — daí "ablásticos".' }
   ] },
 
 { type:'read', tag:'Biologia e tecnologia', title:'Esponjas e medicamentos', src:'Boxe do capítulo',
@@ -943,7 +944,6 @@ const STEPS_PORIFEROS = [
       options:['medicamentos','combustíveis','plásticos','metais'], correct:0, explain:'Muitos remédios vêm de seres vivos.' }
   ] },
 
-{ type:'deck' },
 { type:'summary' }
 ];
 
@@ -1256,9 +1256,16 @@ function home(){
     h+='<div class="home-card" data-s="'+s.key+'"><div class="home-emoji">'+s.emoji+'</div>'+
        '<div><h3>'+s.name+'</h3><p>'+(n>1?n+' capítulos':CHAPTERS[s.chapters[0]].title)+'</p></div></div>';
   });
+  const unlocked=fcUnlocked().filter(k=>CHAPTERS[k]);
+  if(unlocked.length){
+    h+='<div style="margin-top:18px;border-top:1px solid var(--line);padding-top:14px"><h3 style="margin:0 0 4px;font-size:16px">📇 Revisar</h3><p class="line" style="margin:0 0 10px">Flashcards desbloqueados — pratique quando quiser:</p>';
+    unlocked.forEach(k=>{ const c=CHAPTERS[k]; h+='<div class="home-card rev-card" data-fc="'+k+'"><div class="home-emoji">📇</div><div><h3>'+c.title+'</h3><p>'+c.subject+' • flashcards</p></div></div>'; });
+    h+='</div>';
+  }
   h+='<div class="kbd">Protótipo. Cada capítulo foi construído a partir do material real enviado.</div>';
   card.innerHTML=h; stage.appendChild(card);
-  card.querySelectorAll('.home-card').forEach(el=> el.onclick=()=>{ const s=SUBJECTS.find(x=>x.key===el.dataset.s); if(s.chapters.length===1) startChapter(s.chapters[0]); else chooseChapter(s.key); });
+  card.querySelectorAll('.home-card[data-s]').forEach(el=> el.onclick=()=>{ const s=SUBJECTS.find(x=>x.key===el.dataset.s); if(s.chapters.length===1) startChapter(s.chapters[0]); else chooseChapter(s.key); });
+  card.querySelectorAll('[data-fc]').forEach(el=> el.onclick=()=>openFlashcards(el.dataset.fc));
 }
 function chooseChapter(subjKey){
   const s=SUBJECTS.find(x=>x.key===subjKey);
@@ -1297,7 +1304,7 @@ function render(){
       linesHTML(chapter.intro)+
       '<div class="row"><button class="btn" id="go">Começar a estudar →</button>'+
       '<button class="btn alt" id="vresumo">📄 Ver / imprimir resumo</button></div>'+
-      '<div class="kbd">O resumo de 1 página fica disponível a qualquer momento. Flashcards: <span class="fc-counter">📇 <b id="fcCount">0</b></span> — criados conforme você avança.</div>'+
+      '<div class="kbd">O resumo de 1 página fica disponível a qualquer momento. Ao <b>concluir o capítulo</b>, os flashcards são <b>desbloqueados</b> na tela inicial (📇 Revisar).</div>'+
       (TEST? '<div class="kbd" style="margin-top:10px;border-top:1px dashed var(--line);padding-top:10px">🔧 Atalho de teste — pular para: <select id="jump" class="matchsel" style="max-width:300px;display:inline-block;width:auto">'+jOpts+'</select></div>' : '');
     stage.appendChild(card);
     document.getElementById('go').onclick=next;
@@ -1433,28 +1440,33 @@ function octopusSVG(hl){
 function labtxt(x,y,t){ return '<text x="'+x+'" y="'+y+'" fill="#cdd4ff" font-size="12" text-anchor="middle">'+t+'</text>'; }
 
 /* ---- baralho ---- */
-function renderDeck(card){
+function renderDeck(card, standalone){
   let pos=0;
-  const cards=allCards();  // sempre o capítulo inteiro, independente de por onde se passou
+  const cards=allCards();  // sempre o capítulo inteiro
   function draw(){
     card.className='card';
     if(!cards.length){ card.innerHTML='<p>Nenhum flashcard.</p>'; return; }
     const c=cards[pos];
-    card.innerHTML='<div class="tag rev">📇 Revisão de flashcards</div>'+
+    card.innerHTML=(standalone?'<button class="backbar" id="fhome">← Início</button>':'')+
+      '<div class="tag rev">📇 '+(standalone?('Flashcards — '+chapter.title):'Revisão de flashcards')+'</div>'+
       '<p class="hint">Cobrem todo o capítulo. Cartão <b>'+(pos+1)+'</b> de <b>'+cards.length+'</b>. Toque para virar.</p>'+
       '<div class="flash"><div class="flash-inner" id="fi"><div class="face front"><div class="fc-cat">'+c.cat+'</div>'+c.q+'</div>'+
       '<div class="face back"><div class="fc-cat">resposta</div>'+c.a+'</div></div></div>'+
       '<div class="row"><button class="btn alt" id="flip">Virar</button>'+
       (pos>0?'<button class="btn alt" id="prev">← Anterior</button>':'')+
-      (pos<cards.length-1?'<button class="btn" id="nxc">Próximo →</button>':'<button class="btn ok" id="done">Terminar revisão →</button>')+'</div>';
+      (pos<cards.length-1?'<button class="btn" id="nxc">Próximo →</button>':'<button class="btn ok" id="done">'+(standalone?'Concluir ✓':'Terminar revisão →')+'</button>')+'</div>';
     const fi=document.getElementById('fi'); const flip=()=>fi.classList.toggle('flip');
     fi.onclick=flip; document.getElementById('flip').onclick=flip;
     const nb=document.getElementById('nxc'); if(nb) nb.onclick=()=>{pos++;draw();};
     const pb=document.getElementById('prev'); if(pb) pb.onclick=()=>{pos--;draw();};
-    const db=document.getElementById('done'); if(db) db.onclick=next;
+    const db=document.getElementById('done'); if(db) db.onclick=standalone?home:next;
+    const fh=document.getElementById('fhome'); if(fh) fh.onclick=home;
   }
   draw();
 }
+function fcUnlocked(){ try{ return JSON.parse(localStorage.getItem('ea_fc_unlocked')||'[]'); }catch(e){ return []; } }
+function unlockFc(key){ try{ const u=fcUnlocked(); if(!u.includes(key)){ u.push(key); localStorage.setItem('ea_fc_unlocked', JSON.stringify(u)); } }catch(e){} }
+function openFlashcards(key){ chapter=CHAPTERS[key]; STEPS=chapter.steps; idx=0; setProgress(); stage.innerHTML=''; const card=document.createElement('div'); stage.appendChild(card); renderDeck(card,true); window.scrollTo({top:0}); }
 
 /* ---- resumo (todos os itens, independe de progresso) ---- */
 function allCards(){ const out=[]; STEPS.forEach(s=>{ (s.cards||[]).forEach(c=>{ if(!out.some(d=>d.q===c.q)) out.push({cat:c.cat||'Conceito',q:c.q,a:c.a}); }); }); return out; }
@@ -1482,6 +1494,7 @@ function showResumo(){
 /* ---- resumo final ---- */
 function renderSummary(card){
   const pct=stats.attempts?Math.round(stats.correct/stats.attempts*100):0;
+  unlockFc(chapter.key);
   card.className='card summary';
   card.innerHTML='<button class="backbar" id="home">← Matérias</button>'+
     '<div class="tag final">🎓 Capítulo concluído</div>'+
@@ -1492,14 +1505,15 @@ function renderSummary(card){
       stat('Vezes que voltou ao texto', stats.rereads)+
       stat('Flashcards do capítulo', allCards().length)+
     '</div>'+
-    '<div class="feedback" style="margin-top:18px"><h4 style="color:var(--brand2)">Sobre os flashcards</h4>'+
-    '<p>Os '+allCards().length+' cartões cobrem todo o conteúdo da fonte — independentemente do que você acertou hoje. '+
-    'A revisão espaçada (numa versão completa) mostraria mais espaçados os que você domina e com mais frequência os que erra.</p></div>'+
-    '<div class="row"><button class="btn" id="resumo">📄 Resumo de 1 página</button><button class="btn alt" id="again">Refazer capítulo</button><button class="btn alt" id="home2">Outra matéria</button></div>';
+    '<div class="feedback" style="margin-top:18px"><h4 style="color:var(--brand2)">🔓 Flashcards desbloqueados!</h4>'+
+    '<p>Os '+allCards().length+' cartões deste capítulo agora ficam na <b>tela inicial</b>, em "📇 Revisar", para praticar quando quiser. A revisão rende mais quando é espaçada no tempo.</p></div>'+
+    '<div class="row"><button class="btn ok" id="fcgo">📇 Fazer flashcards agora</button><button class="btn" id="resumo">📄 Resumo de 1 página</button></div>'+
+    '<div class="row"><button class="btn alt" id="again">Refazer capítulo</button><button class="btn alt" id="home2">Outra matéria</button></div>';
   document.getElementById('again').onclick=()=>startChapter(chapter.key);
   document.getElementById('home').onclick=home;
   document.getElementById('home2').onclick=home;
   document.getElementById('resumo').onclick=showResumo;
+  var _f=document.getElementById('fcgo'); if(_f) _f.onclick=()=>openFlashcards(chapter.key);
 }
 function stat(l,v){ return '<div class="stat"><span class="muted">'+l+'</span><b>'+v+'</b></div>'; }
 
