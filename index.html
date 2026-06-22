@@ -205,6 +205,9 @@
   .scorehud #sctime{color:var(--brand2);font-weight:800}
   .stat.me{background:rgba(124,140,255,.16);border-radius:8px;padding-left:10px;padding-right:10px}
   .stat.me b{color:var(--brand2)}
+  .mapa{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:6px 0;line-height:1.85;font-size:15px;overflow-x:auto}
+  .mapa b{font-weight:800}
+  .m-coord{color:#56e0c4}.m-sub{color:#7c8cff}.m-subst{color:#ffcf6b}.m-adj{color:#37d399}.m-adv{color:#ff7a90}
 </style>
 </head>
 <body>
@@ -1307,6 +1310,8 @@ const STEPS_PLATELMINTOS = [
 { type:'summary' }
 ];
 
+const MAPA_FULL='<div class="mapa"><b>ORAÇÕES</b><br>├─ <b class="m-coord">COORDENADAS</b> → sindéticas · assindéticas<br>└─ <b class="m-sub">SUBORDINADAS</b><br>&nbsp;&nbsp;&nbsp;├─ <b class="m-subst">Substantivas</b> → subjetiva · obj. direta · obj. indireta · completiva nominal · predicativa · apositiva · agente da passiva<br>&nbsp;&nbsp;&nbsp;├─ <b class="m-adj">Adjetivas</b> → restritiva · explicativa<br>&nbsp;&nbsp;&nbsp;└─ <b class="m-adv">Adverbiais</b> → causal · consecutiva · condicional · concessiva · comparativa · conformativa · final · proporcional · temporal</div>';
+const MAPA_TOPO='<div class="mapa"><b>ORAÇÕES</b><br>├─ <b class="m-coord">COORDENADAS</b> (independentes)<br>└─ <b class="m-sub">SUBORDINADAS</b> (uma exerce função na outra)</div>';
 const STEPS_PC = [
 { type:'intro' },
 
@@ -1331,51 +1336,71 @@ const STEPS_PC = [
       options:['Uma (período simples)','Duas','Três','Nenhuma'], correct:0, explain:'Um verbo → uma oração → período simples.' }
   ] },
 
-{ type:'read', tag:'SD 10 · 3-4', title:'Coordenação × subordinação', src:'Nota de aula',
+{ type:'read', tag:'SD 10 · 3-4', title:'O primeiro corte: coordenação × subordinação', src:'Nota de aula',
   lines:[
-    'Na <b>coordenação</b>, as orações são <b>independentes</b> (uma não exerce função sintática na outra). Ex.: "O aluno leu o texto e respondeu às questões."',
-    'Na <b>subordinação</b>, uma oração <b>exerce função sintática</b> em relação a outra.',
-    'A <b>oração principal</b> é aquela à qual a subordinada se liga; a <b>subordinada</b> exerce uma função na principal.',
-    'Ex.: "O professor percebeu <i>que os alunos estavam atentos</i>." → a subordinada completa "percebeu" (objeto direto).',
-    'O <b>período misto</b> tem, ao mesmo tempo, coordenação e subordinação.'
+    'No período composto, o <b>primeiro corte</b> é este:',
+    MAPA_TOPO,
+    'Na <b>coordenação</b>, as orações são <b>independentes</b>: uma não exerce função sintática na outra. Ex.: "O aluno leu o texto e respondeu às questões."',
+    'Na <b>subordinação</b>, uma oração <b>exerce função</b> em relação a outra (a <b>principal</b>). Ex.: "O professor percebeu <i>que os alunos estavam atentos</i>" (completa "percebeu").',
+    'O <b>período misto</b> tem coordenação e subordinação ao mesmo tempo.'
   ],
   cards:[
-    {cat:'Coord×Sub',q:'Quando há coordenação entre orações?',a:'Quando as orações são sintaticamente independentes (uma não exerce função na outra).'},
+    {cat:'Coord×Sub',q:'Qual o primeiro corte na classificação das orações?',a:'Coordenadas (independentes) × subordinadas (uma exerce função na outra).'},
     {cat:'Coord×Sub',q:'Quando há subordinação?',a:'Quando uma oração exerce função sintática em relação à principal.'},
-    {cat:'Coord×Sub',q:'O que é período misto?',a:'O que apresenta, ao mesmo tempo, coordenação e subordinação.'}
+    {cat:'Coord×Sub',q:'O que é período misto?',a:'O que tem coordenação e subordinação ao mesmo tempo.'}
   ],
   questions:[
     { type:'mc', q:'"O professor explicou o conteúdo e os alunos fizeram anotações." é período composto por:',
       options:['Coordenação','Subordinação','Misto','Simples'], correct:0, explain:'Orações independentes → coordenação.' },
     { type:'mc', q:'"A professora percebeu que a turma estava atenta." é período composto por:',
-      options:['Subordinação','Coordenação','Misto','Simples'], correct:0, explain:'A oração "que a turma estava atenta" exerce função (objeto direto) → subordinação.' },
-    { type:'mc', q:'"O aluno estudou, mas não compreendeu que a atividade era avaliativa." é:',
-      options:['Misto (coordenação + subordinação)','Só coordenação','Só subordinação','Simples'], correct:0, explain:'Há coordenação e subordinação no mesmo período.' }
+      options:['Subordinação','Coordenação','Misto','Simples'], correct:0, explain:'"que a turma estava atenta" exerce função (objeto direto) → subordinação.' },
+    { type:'typed', q:'Classifique o corte: "O aluno estudou, mas não compreendeu que a atividade era avaliativa." (coordenação, subordinação ou misto?)', accept:['misto'], explain:'Tem coordenação e subordinação juntas → misto.' }
   ] },
 
-{ type:'read', tag:'SD 10 · 5', title:'O mapa: os três tipos de subordinada', src:'Nota de aula',
+{ type:'read', tag:'SD 10 · 5', title:'O grande mapa das orações', src:'Mapa mental',
   lines:[
-    'As subordinadas exercem funções parecidas com as de <b>substantivo</b>, <b>adjetivo</b> ou <b>advérbio</b>. Daí os três grupos:',
-    '<b>Substantiva</b>: função típica de substantivo (sujeito, objeto...). Ex.: "Espero <i>que você compreenda</i>."',
-    '<b>Adjetiva</b>: caracteriza um substantivo/pronome <b>antecedente</b>. Ex.: "O aluno <i>que estudou</i> foi aprovado."',
-    '<b>Adverbial</b>: expressa uma <b>circunstância</b> em relação à principal. Ex.: "Estudei muito <i>porque queria aprender</i>."',
-    'Roteiro: ache os verbos → separe as orações → ache a principal → veja se a subordinada completa um verbo/nome (substantiva), caracteriza um antecedente (adjetiva) ou expressa circunstância (adverbial).'
+    'Antes de sair classificando, veja <b>todas as possibilidades</b> num mapa só. Vamos preenchê-lo passo a passo:',
+    MAPA_FULL,
+    'Cada cor é um caminho: <b class="m-coord">coordenadas</b>, e dentro das <b class="m-sub">subordinadas</b> → <b class="m-subst">substantivas</b>, <b class="m-adj">adjetivas</b> e <b class="m-adv">adverbiais</b>.',
+    'A pergunta-chave para descer no mapa: a oração <b>completa</b> um verbo/nome (substantiva)? <b>caracteriza</b> um antecedente (adjetiva)? <b>expressa circunstância</b> (adverbial)?'
   ],
   cards:[
-    {cat:'Os 3 tipos',q:'Quais são os três tipos de oração subordinada?',a:'Substantiva, adjetiva e adverbial.'},
-    {cat:'Os 3 tipos',q:'O que faz a subordinada adjetiva?',a:'Caracteriza/especifica um substantivo ou pronome antecedente.'},
-    {cat:'Os 3 tipos',q:'O que faz a subordinada adverbial?',a:'Expressa uma circunstância (causa, tempo, condição...) em relação à principal.'}
+    {cat:'Mapa',q:'Em que dois grandes grupos as orações se dividem?',a:'Coordenadas e subordinadas.'},
+    {cat:'Mapa',q:'Em que três tipos as subordinadas se dividem?',a:'Substantivas, adjetivas e adverbiais.'},
+    {cat:'Mapa',q:'Qual a pergunta-chave para classificar uma subordinada?',a:'Ela completa um verbo/nome (substantiva), caracteriza um antecedente (adjetiva) ou expressa circunstância (adverbial)?'}
   ],
   questions:[
-    { type:'match', q:'Associe o tipo de subordinada à sua função:',
+    { type:'match', q:'Descendo o mapa: associe o tipo de subordinada à sua função:',
       pairs:[['Substantiva','função de substantivo'],['Adjetiva','caracteriza um antecedente'],['Adverbial','expressa circunstância']], explain:'Substantiva = substantivo; adjetiva = antecedente; adverbial = circunstância.' },
-    { type:'typed', q:'Em "O aluno que estudou foi aprovado", a oração "que estudou" é de que tipo? (substantiva, adjetiva ou adverbial)', accept:['adjetiva'], explain:'Caracteriza o antecedente "o aluno" → adjetiva.' },
-    { type:'typed', q:'Em "Espero que você compreenda", a oração "que você compreenda" é de que tipo?', accept:['substantiva'], explain:'Completa o verbo "espero" → substantiva.' }
+    { type:'typed', q:'No mapa, "O aluno que estudou foi aprovado" → "que estudou" é subordinada de que tipo?', accept:['adjetiva'], explain:'Caracteriza o antecedente "o aluno" → adjetiva.' },
+    { type:'typed', q:'No mapa, "Espero que você compreenda" → "que você compreenda" é de que tipo?', accept:['substantiva'], explain:'Completa o verbo "espero" → substantiva.' },
+    { type:'typed', q:'No mapa, "Estudei porque queria aprender" → "porque queria aprender" é de que tipo?', accept:['adverbial'], explain:'Expressa circunstância (causa) → adverbial.' }
   ] },
 
-{ type:'read', tag:'SD 10 · 6', title:'Subordinadas substantivas — os tipos', src:'Nota de aula',
+{ type:'read', tag:'Complemento', title:'Ramo das coordenadas: sindéticas × assindéticas', src:'Classificação geral',
   lines:[
-    'A substantiva exerce função de substantivo. Os tipos:',
+    'As <b class="m-coord">coordenadas</b> (orações independentes) dividem-se em duas:',
+    '<b>Assindéticas</b>: ligadas <b>sem conjunção</b>, apenas por vírgula. Ex.: "Cheguei, vi, venci." / "Os alunos leram, anotaram, perguntaram."',
+    '<b>Sindéticas</b>: ligadas <b>por conjunção</b> (e, mas, ou, portanto...). Ex.: "O professor explicou <b>e</b> os alunos anotaram."',
+    'Dica: tem conjunção? <b>sindética</b>. Só vírgula? <b>assindética</b>.'
+  ],
+  cards:[
+    {cat:'Coordenadas',q:'Em que duas se dividem as coordenadas?',a:'Sindéticas (com conjunção) e assindéticas (sem conjunção, só vírgula).'},
+    {cat:'Coordenadas',q:'O que é uma coordenada assindética?',a:'A que se liga à outra sem conjunção, apenas por vírgula (ex.: "Cheguei, vi, venci").'},
+    {cat:'Coordenadas',q:'O que é uma coordenada sindética?',a:'A introduzida por uma conjunção (e, mas, ou, portanto...).'}
+  ],
+  questions:[
+    { type:'mc', q:'"Os alunos leram, anotaram, perguntaram." As coordenadas são:',
+      options:['Assindéticas (sem conjunção)','Sindéticas (com conjunção)','Subordinadas','Misto'], correct:0, explain:'Ligadas só por vírgula → assindéticas.' },
+    { type:'mc', q:'"O professor explicou e os alunos anotaram." A 2ª coordenada é:',
+      options:['Sindética (tem a conjunção "e")','Assindética','Subordinada substantiva','Adverbial'], correct:0, explain:'Introduzida pela conjunção "e" → sindética.' },
+    { type:'cloze', q:'Complete: coordenada com conjunção é ___; sem conjunção é assindética.',
+      options:['sindética','principal','reduzida','restritiva'], correct:0, explain:'Com conjunção = sindética.' }
+  ] },
+
+{ type:'read', tag:'SD 10 · 6', title:'Ramo das substantivas — os tipos', src:'Nota de aula',
+  lines:[
+    '<b class="m-subst">Substantivas</b> exercem função de substantivo. Os tipos:',
     '<b>Subjetiva</b>: é o <b>sujeito</b> da principal. Ex.: "É necessário <i>que todos estudem</i>."',
     '<b>Objetiva direta</b>: <b>objeto direto</b> do verbo. Ex.: "O professor explicou <i>que a atividade seria avaliativa</i>."',
     '<b>Objetiva indireta</b>: <b>objeto indireto</b> (verbo com preposição). Ex.: "Insisto <i>em que você participe</i>."',
@@ -1406,7 +1431,7 @@ const STEPS_PC = [
     'As substantivas costumam ser introduzidas pelas <b>conjunções integrantes</b> "<b>que</b>" e "<b>se</b>".',
     'O <b>"que" integrante</b> traz ideia de <b>declaração/certeza/fato</b>: "Ele disse <i>que</i> viria."',
     'O <b>"se" integrante</b> traz ideia de <b>dúvida, incerteza ou pergunta indireta</b>: "Ele perguntou <i>se</i> eu viria."',
-    'A subordinação substantiva ajuda na <b>impessoalização</b>: "É necessário que...", "Sabe-se que...", "Verifica-se que..." deslocam o foco do enunciador para a informação (tom objetivo/formal).'
+    'A substantiva ajuda na <b>impessoalização</b>: "É necessário que...", "Sabe-se que...", "Verifica-se que..." deslocam o foco do enunciador para a informação (tom objetivo/formal).'
   ],
   cards:[
     {cat:'que/se',q:'Que ideia o "que" integrante traz?',a:'Declaração, certeza, fato (conteúdo afirmado).'},
@@ -1422,9 +1447,9 @@ const STEPS_PC = [
       options:['declaração','dúvida','condição','tempo'], correct:0, explain:'Declaração/fato; o "se" é que traz dúvida.' }
   ] },
 
-{ type:'read', tag:'SD 10 · 8', title:'Subordinadas adjetivas: restritiva × explicativa', src:'Nota de aula',
+{ type:'read', tag:'SD 10 · 8', title:'Ramo das adjetivas: restritiva × explicativa', src:'Nota de aula',
   lines:[
-    'A adjetiva caracteriza um <b>antecedente</b> (substantivo/pronome) e é introduzida por <b>pronome relativo</b> (que, quem, o qual, cujo, onde...).',
+    '<b class="m-adj">Adjetivas</b> caracterizam um <b>antecedente</b> (substantivo/pronome) e são introduzidas por <b>pronome relativo</b> (que, quem, o qual, cujo, onde...).',
     '<b>Restritiva</b>: <b>delimita</b> o antecedente e <b>não</b> vem entre vírgulas. "Os alunos <i>que estudaram</i> foram aprovados." → só esses.',
     '<b>Explicativa</b>: <b>acrescenta</b> informação e vem <b>entre vírgulas</b> (ou travessões/parênteses). "Os alunos, <i>que estudaram</i>, foram aprovados." → todos estudaram.',
     'Ou seja, a <b>vírgula muda o sentido</b>: sem vírgula restringe; com vírgula explica.'
@@ -1465,9 +1490,9 @@ const STEPS_PC = [
       options:['Objeto indireto','Sujeito','Objeto direto','Predicativo'], correct:0, explain:'"precisamos da prova" → objeto indireto.' }
   ] },
 
-{ type:'read', tag:'SD 10 · 7', title:'Subordinadas adverbiais — as circunstâncias', src:'Nota de aula',
+{ type:'read', tag:'SD 10 · 7', title:'Ramo das adverbiais — as circunstâncias', src:'Nota de aula',
   lines:[
-    'A adverbial expressa uma <b>circunstância</b>. Principais tipos e conectivos:',
+    '<b class="m-adv">Adverbiais</b> expressam uma <b>circunstância</b>. Principais tipos e conectivos:',
     '<b>Causal</b> (motivo): porque, como, já que, visto que. "Não fui à aula <i>porque estava doente</i>."',
     '<b>Consecutiva</b> (consequência): tão/tanto... que, de modo que. "Estudou <i>tanto que</i> conseguiu boa nota."',
     '<b>Condicional</b> (condição): se, caso, desde que. "<i>Se houver tempo</i>, faremos revisão."',
@@ -1487,30 +1512,12 @@ const STEPS_PC = [
       pairs:[['porque','causal'],['se','condicional'],['embora','concessiva'],['para que','final']], explain:'porque=causa; se=condição; embora=concessão; para que=finalidade.' },
     { type:'match', q:'Associe novamente:',
       pairs:[['à medida que','proporcional'],['conforme','conformativa'],['quando','temporal'],['tão... que','consecutiva']], explain:'Cada conectivo marca sua circunstância.' },
-    { type:'typed', q:'"Não fui à aula porque estava doente." Tipo da adverbial "porque estava doente"?', accept:['causal'], explain:'"porque" = causa.' },
+    { type:'typed', q:'"Não fui à aula porque estava doente." Tipo da adverbial?', accept:['causal'], explain:'"porque" = causa.' },
     { type:'typed', q:'"Embora estivesse cansado, terminou a atividade." Tipo da adverbial?', accept:['concessiva'], explain:'"embora" = concessão.' },
     { type:'typed', q:'"Estudei bastante para que pudesse compreender." Tipo da adverbial?', accept:['final'], explain:'"para que" = finalidade.' },
     { type:'typed', q:'"À medida que praticava, adquiria mais segurança." Tipo?', accept:['proporcional'], explain:'"à medida que" = proporcional.' },
     { type:'mc', q:'"O aluno escreveu melhor do que esperávamos." A adverbial é:',
       options:['Comparativa','Causal','Temporal','Final'], correct:0, explain:'"do que" → comparação.' }
-  ] },
-
-{ type:'read', tag:'SD 10 · 3', title:'Período composto por coordenação', src:'Nota de aula',
-  lines:[
-    'Na <b>coordenação</b>, as orações são <b>sintaticamente independentes</b>: nenhuma exerce função na outra (diferente da subordinação).',
-    'Ex.: "O professor explicou o conteúdo <b>e</b> os alunos fizeram anotações." → duas orações independentes.',
-    'Quando o período tem coordenação <b>e</b> subordinação ao mesmo tempo, é <b>período misto</b>.',
-    'Obs.: esta SD foca a <b>subordinação</b>; os subtipos de coordenadas (aditiva, adversativa etc.) não estão neste material — dá para acrescentar depois.'
-  ],
-  cards:[
-    {cat:'Coordenação',q:'O que caracteriza as orações coordenadas?',a:'São sintaticamente independentes (uma não exerce função na outra).'},
-    {cat:'Coordenação',q:'Como se chama o período com coordenação e subordinação juntas?',a:'Período misto.'}
-  ],
-  questions:[
-    { type:'mc', q:'A diferença central entre coordenação e subordinação é:',
-      options:['Na coordenação as orações são independentes; na subordinação uma exerce função na outra','Não há diferença','A coordenação só usa vírgula','A subordinação não tem verbo'], correct:0, explain:'Independência × função sintática.' },
-    { type:'cloze', q:'Complete: período com coordenação e subordinação ao mesmo tempo é período ___.',
-      options:['misto','simples','composto por coordenação','reduzido'], correct:0, explain:'Período misto.' }
   ] },
 
 { type:'read', tag:'SD 10 · 13', title:'Pontuação no período composto', src:'Nota de aula',
@@ -1530,9 +1537,80 @@ const STEPS_PC = [
       options:['Explicativa','Restritiva','Substantiva','Adverbial'], correct:0, explain:'Entre vírgulas → explicativa.' }
   ] },
 
+{ type:'read', tag:'Treino', title:'Ginásio de classificação I (geral)', src:'Gabarito',
+  lines:[
+    'Hora de treinar! Em cada período, classifique a oração subordinada destacada. Volte ao mapa sempre que precisar.'
+  ],
+  questions:[
+    { type:'typed', q:'"É fundamental que todos compreendam o conteúdo." A subordinada "que todos compreendam..." é substantiva ___ (subtipo).', accept:['subjetiva'], explain:'Sujeito de "é fundamental" → subjetiva.' },
+    { type:'typed', q:'"O aluno afirmou que havia estudado." Tipo/subtipo da substantiva?', accept:['objetiva direta','direta'], explain:'Objeto direto de "afirmou" → objetiva direta.' },
+    { type:'mc', q:'"Não sei se a atividade será corrigida hoje." A oração "se a atividade..." é:',
+      options:['Substantiva objetiva direta','Adverbial condicional','Adjetiva restritiva','Coordenada'], correct:0, explain:'"se" integrante (dúvida) completando "sei" → objetiva direta (cuidado: não é condicional!).' },
+    { type:'mc', q:'"Os estudantes que fizeram a revisão tiveram melhor desempenho." A adjetiva é:',
+      options:['Restritiva','Explicativa','Substantiva','Adverbial'], correct:0, explain:'Sem vírgulas → restritiva.' },
+    { type:'mc', q:'"Os estudantes, que fizeram a revisão, tiveram melhor desempenho." A adjetiva é:',
+      options:['Explicativa','Restritiva','Substantiva','Final'], correct:0, explain:'Entre vírgulas → explicativa.' },
+    { type:'typed', q:'"Embora estivesse cansado, o aluno concluiu a tarefa." Tipo da adverbial?', accept:['concessiva'], explain:'"Embora" → concessiva.' },
+    { type:'typed', q:'"Como havia estudado bastante, resolveu a prova com tranquilidade." Tipo da adverbial?', accept:['causal'], explain:'"Como" com valor de causa → causal.' },
+    { type:'typed', q:'"A professora explicou o conteúdo para que todos tirassem as dúvidas." Tipo da adverbial?', accept:['final'], explain:'"para que" → final.' },
+    { type:'typed', q:'"Quando a aula terminou, os alunos entregaram os exercícios." Tipo da adverbial?', accept:['temporal'], explain:'"Quando" → temporal.' },
+    { type:'typed', q:'"O resultado foi melhor do que esperávamos." Tipo da adverbial?', accept:['comparativa'], explain:'"do que" → comparativa.' }
+  ] },
+
+{ type:'read', tag:'Treino', title:'Ginásio de classificação II (substantivas)', src:'Gabarito',
+  lines:[
+    'Agora só substantivas: diga o subtipo de cada uma (lembre a função sintática).'
+  ],
+  questions:[
+    { type:'mc', q:'"Tenho certeza de que ele virá." A substantiva "de que ele virá" é:',
+      options:['Completiva nominal','Subjetiva','Objetiva direta','Apositiva'], correct:0, explain:'Completa o nome "certeza" → completiva nominal.' },
+    { type:'mc', q:'"A verdade é que precisamos revisar." A substantiva é:',
+      options:['Predicativa','Subjetiva','Objetiva indireta','Apositiva'], correct:0, explain:'Predicativo do sujeito, após "é" → predicativa.' },
+    { type:'mc', q:'"Desejo apenas isto: que você participe." A substantiva é:',
+      options:['Apositiva','Predicativa','Subjetiva','Objetiva direta'], correct:0, explain:'Aposto do termo "isto" → apositiva.' },
+    { type:'mc', q:'"As decisões foram tomadas por quem tinha competência." A substantiva é:',
+      options:['Agente da passiva','Objetiva indireta','Subjetiva','Completiva nominal'], correct:0, explain:'Indica por quem a ação foi feita → agente da passiva.' },
+    { type:'typed', q:'"O professor explicou que haveria atividade." Subtipo da substantiva?', accept:['objetiva direta','direta'], explain:'Objeto direto de "explicou".' },
+    { type:'typed', q:'"É necessário que a turma participe." Subtipo da substantiva?', accept:['subjetiva'], explain:'Sujeito de "é necessário" → subjetiva.' }
+  ] },
+
+{ type:'read', tag:'Treino', title:'Ginásio III — o "que" e o "se" camaleões', src:'Nota de aula · 9-10',
+  lines:[
+    'A mesma palavra muda de papel conforme a função. Classifique cada oração introduzida por "que"/"se".'
+  ],
+  questions:[
+    { type:'mc', q:'"Não sei se ele virá." A oração "se ele virá" é:',
+      options:['Substantiva objetiva direta (se = dúvida)','Adverbial condicional','Adjetiva','Coordenada'], correct:0, explain:'"se" integrante (dúvida) completa "sei" → objetiva direta.' },
+    { type:'mc', q:'"Irei à reunião se ele vier." A oração "se ele vier" é:',
+      options:['Adverbial condicional','Substantiva objetiva direta','Adjetiva','Predicativa'], correct:0, explain:'Aqui "se" = condição → adverbial condicional.' },
+    { type:'mc', q:'"Estava tão cansado que dormiu." A oração "que dormiu" é:',
+      options:['Adverbial consecutiva','Substantiva','Adjetiva','Coordenada'], correct:0, explain:'"tão... que" → consequência → consecutiva.' },
+    { type:'mc', q:'"A aluna que apresentou o trabalho recebeu elogios." A oração "que apresentou..." é:',
+      options:['Adjetiva (que = pronome relativo)','Substantiva','Adverbial','Coordenada'], correct:0, explain:'"que" retoma "a aluna" (antecedente) → adjetiva.' },
+    { type:'mc', q:'"A professora disse que a turma avançou." A oração "que a turma avançou" é:',
+      options:['Substantiva objetiva direta','Adjetiva','Adverbial consecutiva','Coordenada'], correct:0, explain:'"que" integrante completa "disse" → substantiva objetiva direta.' }
+  ] },
+
+{ type:'read', tag:'Revisão', title:'O mapa completo — fechando o raciocínio', src:'Mapa mental',
+  lines:[
+    'Agora o mapa inteiro faz sentido. Use-o como checklist ao classificar qualquer período:',
+    MAPA_FULL,
+    'Roteiro: 1) ache os verbos e separe as orações; 2) coordenada (independente) ou subordinada?; 3) se subordinada: completa verbo/nome (substantiva), caracteriza antecedente (adjetiva) ou dá circunstância (adverbial)?; 4) desça até o subtipo.'
+  ],
+  cards:[
+    {cat:'Mapa',q:'Qual a sequência para classificar um período composto?',a:'Separe as orações → coordenada ou subordinada → (se subordinada) substantiva/adjetiva/adverbial → subtipo.'}
+  ],
+  questions:[
+    { type:'typed', q:'"Os alunos que estudaram foram aprovados porque revisaram a tempo." A 1ª subordinada ("que estudaram") é de que tipo?', accept:['adjetiva','adjetiva restritiva'], explain:'Caracteriza "os alunos" → adjetiva (restritiva).' },
+    { type:'typed', q:'No mesmo período, "porque revisaram a tempo" é de que tipo?', accept:['adverbial','adverbial causal','causal'], explain:'Circunstância de causa → adverbial causal.' },
+    { type:'match', q:'Fechando o mapa, associe:',
+      pairs:[['Coordenada','oração independente'],['Substantiva','função de substantivo'],['Adjetiva','caracteriza antecedente'],['Adverbial','circunstância']], explain:'É o mapa inteiro num golpe de vista.' }
+  ] },
+
 { type:'summary' }
 ];
-const ptIntro=['Aqui você estuda em dois tempos.','1) <b>Lê</b> um trecho curto.','2) Marca "Entendi" — e o texto <b>some</b>.','3) Responde <b>de memória</b>: múltipla escolha, completar, associar pares ou escrever a classificação.','Errou? Você <b>volta ao texto</b> e tenta de novo só aquela pergunta.'];
+const ptIntro=['Aqui você estuda em dois tempos.','1) <b>Lê</b> um trecho curto (às vezes com o <b>mapa mental</b>).','2) Marca "Entendi" — e o texto <b>some</b>.','3) Responde <b>de memória</b>: múltipla escolha, completar, associar ou escrever a classificação.','Errou? Você <b>volta ao texto</b> e tenta de novo só aquela pergunta.'];
+
 
 const bioIntro=['Aqui você estuda em dois tempos.','1) <b>Lê</b> um trecho curto (ou vê a figura).','2) Marca "Entendi" — e o texto <b>some</b>.','3) Responde <b>de memória</b>: múltipla escolha, completar lacuna, associar pares ou identificar na figura.','Errou? Você <b>volta ao texto</b> e tenta de novo só aquela pergunta.'];
 const CHAPTERS = {
